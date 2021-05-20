@@ -5,6 +5,7 @@ namespace App\Services;
 use App\DragAndDropImage;
 use App\Http\Requests\BannerStorageRequest;
 use App\Banner;
+use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Facades\Image;
 
 
@@ -33,6 +34,8 @@ class UploadService
 
     private function storeFile(BannerStorageRequest $request): void
     {
+        Storage::makeDirectory('/public/' . $request['position']);
+
         $file = DragAndDropImage::find($request['id']);
         $fileParts = (explode('.', $file->filename));
         $fileExtension = strtolower(end($fileParts));

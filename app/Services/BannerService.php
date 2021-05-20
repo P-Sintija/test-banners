@@ -21,18 +21,30 @@ class BannerService
     public function handle(): array
     {
         $bannerData = [];
-        if(count(Banner::all()) == 0 ) {
+        $banners = Banner::all();
+        if (count($banners) == 0) {
+            return $bannerData;
+        } else {
+            $positions = [];
+            foreach ($banners->all() as $banner) {
+                if (!in_array($banner->position, $positions)) {
+                    $positions[] = $banner->position;
+                }
+            }
+
+            foreach ($positions as $position) {
+                if ($position === self::SLIDER_POSITION) {
+                    $bannerData[$position] = array_filter($banners->all(), function ($banner) use ($position) {
+                        return $banner->position === $position;
+                    });
+                } else {
+                    $bannerData[$position] = array_filter($banners->all(), function ($banner) use ($position) {
+                        return $banner->position === $position;
+                    });
+                    $bannerData[$position] = $bannerData[$position][array_rand($bannerData[$position])];
+                }
+            }
             return $bannerData;
         }
-        foreach ($this->positionCount() as $position) {
-            if ($position === self::SLIDER_POSITION) {
-                $bannerData[$position] = Banner::where('position', $position)->get();
-            } else {
-                $bannerData[$position] = Banner::where('position', $position)->get()
-                    ->all()[array_rand(Banner::where('position', $position)->get()->all()
-                )];
-            }
-        }
-        return $bannerData;
     }
 }
